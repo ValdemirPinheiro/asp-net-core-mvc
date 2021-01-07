@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace SalesWebMvc.Migrations
 {
@@ -6,62 +8,69 @@ namespace SalesWebMvc.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Seller_Department_Departmentid",
-                table: "Seller");
+            migrationBuilder.CreateTable(
+               name: "Seller",
+               columns: table => new
+               {
+                   Id = table.Column<int>(nullable: false)
+                       .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                   Name = table.Column<string>(nullable: true),
+                   Email = table.Column<string>(nullable: true),
+                   BirthDate = table.Column<DateTime>(nullable: false),
+                   BaseSalary = table.Column<double>(nullable: false),
+                   DepartmentId = table.Column<int>(nullable: true)
+               },
+               constraints: table =>
+               {
+                   table.PrimaryKey("PK_Seller", x => x.Id);
+                   table.ForeignKey(
+                       name: "FK_Seller_Department_DepartmentId",
+                       column: x => x.DepartmentId,
+                       principalTable: "Department",
+                       principalColumn: "Id",
+                       onDelete: ReferentialAction.Restrict);
+               });
 
-            migrationBuilder.RenameColumn(
-                name: "Departmentid",
+            migrationBuilder.CreateTable(
+                name: "SalesRecord",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Date = table.Column<DateTime>(nullable: false),
+                    Amount = table.Column<double>(nullable: false),
+                    Status = table.Column<int>(nullable: false),
+                    SellerId = table.Column<int>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesRecord", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SalesRecord_Seller_SellerId",
+                        column: x => x.SellerId,
+                        principalTable: "Seller",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SalesRecord_SellerId",
+                table: "SalesRecord",
+                column: "SellerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Seller_DepartmentId",
                 table: "Seller",
-                newName: "DepartmentId");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Seller_Departmentid",
-                table: "Seller",
-                newName: "IX_Seller_DepartmentId");
-
-            migrationBuilder.RenameColumn(
-                name: "id",
-                table: "Department",
-                newName: "Id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Seller_Department_DepartmentId",
-                table: "Seller",
-                column: "DepartmentId",
-                principalTable: "Department",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
+                column: "DepartmentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropForeignKey(
-                name: "FK_Seller_Department_DepartmentId",
-                table: "Seller");
+            migrationBuilder.DropTable(
+                name: "SalesRecord");
 
-            migrationBuilder.RenameColumn(
-                name: "DepartmentId",
-                table: "Seller",
-                newName: "Departmentid");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Seller_DepartmentId",
-                table: "Seller",
-                newName: "IX_Seller_Departmentid");
-
-            migrationBuilder.RenameColumn(
-                name: "Id",
-                table: "Department",
-                newName: "id");
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_Seller_Department_Departmentid",
-                table: "Seller",
-                column: "Departmentid",
-                principalTable: "Department",
-                principalColumn: "id",
-                onDelete: ReferentialAction.Restrict);
+            migrationBuilder.DropTable(
+                name: "Seller");
         }
     }
 }
